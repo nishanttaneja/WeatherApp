@@ -41,7 +41,8 @@ class TitleView: CustomView {
             titleStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
             titleStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor),
             titleStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
-            titleStackView.heightAnchor.constraint(equalToConstant: fixedHeight)
+            titleStackView.heightAnchor.constraint(equalToConstant: fixedHeight),
+            titleStackView.heightAnchor.constraint(equalTo: heightAnchor)
         ])
     }
 }
