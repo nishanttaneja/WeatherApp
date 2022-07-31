@@ -48,6 +48,8 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
         switch WeatherViewController.WeatherViewSectionKind(rawValue: index) {
         case .today:
             return weather?.hourlyForecast.count ?? .zero
+        case .nextTenDays:
+            return weather?.forecasts.count ?? .zero
         default:
             return .zero
         }
@@ -58,11 +60,15 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
               index < forecasts.count else { return nil }
         let forecast = forecasts[index]
         let hour = forecast.DateTime.components(separatedBy: "T").last?.components(separatedBy: ":").first ?? ""
-        return .init(temp: "\(forecast.Temperature.Value)", time: hour, condition: forecast.IconPhrase)
+        return .init(temp: "\(Int(forecast.Temperature.Value))", time: hour, condition: forecast.IconPhrase)
     }
     
     func getWeatherDetail(forDayAt index: Int) -> WeatherDetail? {
-        .init(day: "Day \(index)", condition: "sunny", minTemp: "\(70-index)", maxTemp: "\(84-index)")
+        guard let forecasts = weather?.forecasts,
+              forecasts.count > index else { return nil }
+        let forecast = forecasts[index]
+        let day = forecast.Date.components(separatedBy: "T").first?.components(separatedBy: "-").last ?? ""
+        return .init(day: day, condition: forecast.Day.IconPhrase, minTemp: "\(Int(forecast.Temperature.Minimum.Value))", maxTemp: "\(Int(forecast.Temperature.Maximum.Value))")
     }
 }
 

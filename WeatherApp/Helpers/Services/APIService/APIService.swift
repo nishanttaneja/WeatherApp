@@ -67,4 +67,7 @@ extension APIService {
     static var hourlyForecast: APIService<[HourlyForecast]> {
         APIService<[HourlyForecast]>(endpointUrlString: "/forecasts/v1/hourly/12hour")
     }
+    static var fiveDayForecast: APIService<DailyWeather> {
+        APIService<DailyWeather>(endpointUrlString: "/forecasts/v1/daily/5day")
+    }
 }

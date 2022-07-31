@@ -13,7 +13,12 @@ struct DailyWeather: Decodable {
 
 struct DailyForecasts: Decodable {
     let Date: String
-    let RealFeelTemperature: TemperatureRange
+    let Temperature: TemperatureRange
+    let Day: Day
+}
+
+struct Day: Decodable {
+    let IconPhrase: String
 }
 
 struct TemperatureRange: Decodable {

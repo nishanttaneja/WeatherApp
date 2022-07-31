@@ -36,6 +36,7 @@ final class WeatherManager: WeatherManagerService {
     private let apiKey = "L2qDHC76QoM6GbLe8S6qXdioYWVpNSbP"
     private let currentConditionsAPIService: APIService = .currentConditions
     private let hourlyForecastAPIService: APIService = .hourlyForecast
+    private let fiveDayForecastAPIService: APIService = .fiveDayForecast
     
     weak var delegate: WeatherManagerServiceDelegate? = nil
     
@@ -80,6 +81,7 @@ struct Weather {
     var hourlyForecast: [HourlyForecast] = []
     var minTemp: String?
     var maxTemp: String?
+    var forecasts: [DailyForecasts] = []
 }
 
 extension WeatherManager {
@@ -92,6 +94,7 @@ extension WeatherManager {
         let cityKey = "/\(cityDetail.Key)"
         fetchCurrentWeatherConditions(appendingString: cityKey, withParameters: params)
         fetchHourlyForecast(appendingString: cityKey, withParamters: params)
+        fetch5DaysForecast(appendingString: cityKey, withParameters: params)
         dispatchGroup.notify(queue: .main) {
             completionHandler(.success(self.weather))
         }
@@ -105,8 +108,8 @@ extension WeatherManager {
                 guard let currentCondition = currentWeather.first else { break }
                 self.weather.feelsLikeTemp = "\(currentCondition.Temperature.Metric.Value)°"
                 self.weather.condition = currentCondition.WeatherText
-                self.weather.minTemp = "\(currentCondition.TemperatureSummary.Past6HourRange.Minimum.Metric.Value)"
-                self.weather.maxTemp = "\(currentCondition.TemperatureSummary.Past6HourRange.Maximum.Metric.Value)"
+                self.weather.minTemp = "\(Int(currentCondition.TemperatureSummary.Past6HourRange.Minimum.Metric.Value))"
+                self.weather.maxTemp = "\(Int(currentCondition.TemperatureSummary.Past6HourRange.Maximum.Metric.Value))"
             case .failure(let error):
                 self.delegate?.didFail(with: error)
             }
@@ -124,6 +127,21 @@ extension WeatherManager {
                 self.delegate?.didFail(with: error)
             case .success(let hourlyForecast):
                 self.weather.hourlyForecast = hourlyForecast
+            }
+            self.dispatchGroup.leave()
+        }
+    }
+    
+    private func fetch5DaysForecast(appendingString text: String, withParameters params: [URLQueryItem]) {
+        dispatchGroup.enter()
+        var params = params
+        params.append(.init(name: WeatherManagerConstant.kMetric, value: "true"))
+        fiveDayForecastAPIService.fetchResponse(appendingString: text, withParameters: params) { result in
+            switch result {
+            case .failure(let error):
+                self.delegate?.didFail(with: error)
+            case .success(let dailyWeather):
+                self.weather.forecasts = dailyWeather.DailyForecasts
             }
             self.dispatchGroup.leave()
         }
