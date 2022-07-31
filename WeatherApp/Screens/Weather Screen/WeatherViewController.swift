@@ -182,11 +182,34 @@ extension WeatherViewController: UICollectionViewDataSource {
 
 // MARK: - View Lifecycle
 
-extension WeatherViewController {
+extension WeatherViewController {    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if let todaysWeather = viewModel?.getTodaysWeather() {
             titleView.setWeather(todaysWeather)
         }
+    }
+}
+
+
+// MARK: - WeatherViewViewModelDelegate
+
+extension WeatherViewController: WeatherViewViewModelDelegate {
+    func willFetchWeather() {
+        // Start Loading animation
+        debugPrint(#function)
+    }
+    
+    func didFail(with error: APIServiceError) {
+        // Display Error Message
+        debugPrint(#function)
+    }
+    
+    func didUpdateWeather() {
+        debugPrint(#function)
+        if let todaysWeather = viewModel?.getTodaysWeather() {
+            titleView.setWeather(todaysWeather)
+        }
+        collectionView.reloadData()
     }
 }

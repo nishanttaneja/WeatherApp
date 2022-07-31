@@ -9,13 +9,14 @@ import Foundation
 import CoreLocation
 
 struct WeatherManagerConstant {
-    static let apiKey = "L2qDHC76QoM6GbLe8S6qXdioYWVpNSbP"
+    static let kApiKey = "apikey"
+    static let kDetails = "details"
 }
 
 protocol WeatherManagerServiceDelegate: NSObjectProtocol {
     func willFetchWeather(forLocation city: String)
-    func didFetchWeather(_ data: CurrentWeather, forLocation city: String)
-    func didFail(with error: WeatherManagerError)
+    func didFetchWeather(_ data: Weather, forLocation city: String)
+    func didFail(with error: APIServiceError)
 }
 
 protocol WeatherManagerService {
@@ -27,11 +28,16 @@ protocol WeatherManagerService {
 
 final class WeatherManager: WeatherManagerService {
     static let shared: WeatherManagerService = WeatherManager()
-    private init() {}
+    private init() {
+        fetchWeather(forCity: .init(Key: "187745", LocalizedName: "New Delhi"))
+    }
+    
+    private let apiKey = "L2qDHC76QoM6GbLe8S6qXdioYWVpNSbP"
+    private let currentConditionsAPIService: APIService = .currentConditions
     
     weak var delegate: WeatherManagerServiceDelegate? = nil
     
-    private lazy var fetchedCityClosure: (_ result: Result<CityDetail, WeatherManagerError>) -> Void = { [weak self] result in
+    private lazy var fetchedCityClosure: (_ result: Result<CityDetail, APIServiceError>) -> Void = { [weak self] result in
         switch result {
         case .failure(let error):
             self?.delegate?.didFail(with: error)
@@ -39,6 +45,9 @@ final class WeatherManager: WeatherManagerService {
             self?.fetchWeather(forCity: cityDetail)
         }
     }
+    private var weather: Weather = .init()
+    
+    private let dispatchGroup = DispatchGroup()
     
     func fetchWeather(forLocation coordinates: CLLocationCoordinate2D) {
         fetchCityDetails(for: coordinates, completionHandler: fetchedCityClosure)
@@ -62,16 +71,45 @@ final class WeatherManager: WeatherManagerService {
     }
 }
 
+struct Weather {
+    var condition: String?
+    var feelsLikeTemp: String?
+    var city: String?
+}
+
 extension WeatherManager {
-    private func fetchWeather(forCity cityDetail: CityDetail, completionHandler: @escaping (_ result: Result<CurrentWeather, WeatherManagerError>) -> Void) {
+    private func fetchWeather(forCity cityDetail: CityDetail, completionHandler: @escaping (_ result: Result<Weather, APIServiceError>) -> Void) {
+        weather.city = cityDetail.LocalizedName
+        let params: [URLQueryItem] = [
+            .init(name: WeatherManagerConstant.kApiKey, value: apiKey),
+            .init(name: WeatherManagerConstant.kDetails, value: "true"),
+        ]
+        fetchCurrentWeatherConditions(appendingString: "/\(cityDetail.Key)", withParameters: params)
+        dispatchGroup.notify(queue: .main) {
+            completionHandler(.success(self.weather))
+        }
+    }
+    
+    private func fetchCurrentWeatherConditions(appendingString: String, withParameters params: [URLQueryItem]) {
+        dispatchGroup.enter()
+        currentConditionsAPIService.fetchResponse(appendingString: appendingString, withParameters: params) { result in
+            switch result {
+            case .success(let currentWeather):
+                guard let currentCondition = currentWeather.first else { break }
+                self.weather.feelsLikeTemp = "\(currentCondition.RealFeelTemperature.Metric.Value)°"
+                self.weather.condition = currentCondition.WeatherText
+            case .failure(let error):
+                self.delegate?.didFail(with: error)
+            }
+            self.dispatchGroup.leave()
+        }
+    }
+    
+    private func fetchCityDetails(for coordinates: CLLocationCoordinate2D, completionHandler: @escaping (_ result: Result<CityDetail, APIServiceError>) -> Void) {
         
     }
     
-    private func fetchCityDetails(for coordinates: CLLocationCoordinate2D, completionHandler: @escaping (_ result: Result<CityDetail, WeatherManagerError>) -> Void) {
-        
-    }
-    
-    private func fetchCityDetails(for searchText: String, completionHandler: @escaping (_ result: Result<CityDetail, WeatherManagerError>) -> Void) {
+    private func fetchCityDetails(for searchText: String, completionHandler: @escaping (_ result: Result<CityDetail, APIServiceError>) -> Void) {
         
     }
 }

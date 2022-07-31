@@ -13,9 +13,5 @@ struct CurrentWeather: Decodable {
 }
 
 struct RealFeelTemperature: Decodable {
-    let Metric: Metric
-}
-
-struct Metric: Decodable {
-    let Value: Double
+    let Metric: Temperature
 }

@@ -15,7 +15,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = .init(windowScene: scene)
         let viewModel = WeatherViewViewModel()
-        window?.rootViewController = WeatherViewController(viewModel: viewModel)
+        let viewController = WeatherViewController(viewModel: viewModel)
+        viewModel.delegate = viewController
+        window?.rootViewController = viewController
         window?.makeKeyAndVisible()
     }
 

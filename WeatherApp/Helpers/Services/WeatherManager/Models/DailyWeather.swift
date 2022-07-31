@@ -23,5 +23,4 @@ struct TemperatureRange: Decodable {
 
 struct Temperature: Decodable {
     let Value: Double
-    let Phrase: String
 }
