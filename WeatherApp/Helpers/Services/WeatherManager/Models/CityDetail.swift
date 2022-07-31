@@ -7,6 +7,14 @@
 
 import Foundation
 
-struct CityDetail {
-    let name: String
+struct CityDetail: Decodable {
+    let Key: String
+    let LocalizedName: String
+    
+}
+
+extension CityDetail {
+    var name: String {
+        LocalizedName
+    }
 }

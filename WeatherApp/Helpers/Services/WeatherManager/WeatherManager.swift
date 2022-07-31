@@ -8,9 +8,13 @@
 import Foundation
 import CoreLocation
 
+struct WeatherManagerConstant {
+    static let apiKey = "L2qDHC76QoM6GbLe8S6qXdioYWVpNSbP"
+}
+
 protocol WeatherManagerServiceDelegate: NSObjectProtocol {
     func willFetchWeather(forLocation city: String)
-    func didFetchWeather(_ data: Weather, forLocation city: String)
+    func didFetchWeather(_ data: CurrentWeather, forLocation city: String)
     func didFail(with error: WeatherManagerError)
 }
 
@@ -59,7 +63,7 @@ final class WeatherManager: WeatherManagerService {
 }
 
 extension WeatherManager {
-    private func fetchWeather(forCity cityDetail: CityDetail, completionHandler: @escaping (_ result: Result<Weather, WeatherManagerError>) -> Void) {
+    private func fetchWeather(forCity cityDetail: CityDetail, completionHandler: @escaping (_ result: Result<CurrentWeather, WeatherManagerError>) -> Void) {
         
     }
     
