@@ -12,6 +12,7 @@ struct WeatherManagerConstant {
     static let kApiKey = "apikey"
     static let kDetails = "details"
     static let kMetric = "metric"
+    static let kSearchText = "q"
 }
 
 protocol WeatherManagerServiceDelegate: NSObjectProtocol {
@@ -29,14 +30,13 @@ protocol WeatherManagerService {
 
 final class WeatherManager: WeatherManagerService {
     static let shared: WeatherManagerService = WeatherManager()
-    private init() {
-        fetchWeather(forCity: .init(Key: "187745", LocalizedName: "New Delhi"))
-    }
+    private init() {}
     
     private let apiKey = "L2qDHC76QoM6GbLe8S6qXdioYWVpNSbP"
     private let currentConditionsAPIService: APIService = .currentConditions
     private let hourlyForecastAPIService: APIService = .hourlyForecast
     private let fiveDayForecastAPIService: APIService = .fiveDayForecast
+    private let citySearchAPIService: APIService = .searchGeoPosition
     
     weak var delegate: WeatherManagerServiceDelegate? = nil
     
@@ -53,7 +53,11 @@ final class WeatherManager: WeatherManagerService {
     private let dispatchGroup = DispatchGroup()
     
     func fetchWeather(forLocation coordinates: CLLocationCoordinate2D) {
-        fetchCityDetails(for: coordinates, completionHandler: fetchedCityClosure)
+        let params: [URLQueryItem] = [
+            .init(name: WeatherManagerConstant.kApiKey, value: apiKey),
+            .init(name: WeatherManagerConstant.kSearchText, value: "\(coordinates.latitude),\(coordinates.longitude)"),
+        ]
+        citySearchAPIService.fetchResponse(withParameters: params, completionHandler: fetchedCityClosure)
     }
     
     func fetchWeahter(forLocation city: String) {
@@ -145,10 +149,6 @@ extension WeatherManager {
             }
             self.dispatchGroup.leave()
         }
-    }
-    
-    private func fetchCityDetails(for coordinates: CLLocationCoordinate2D, completionHandler: @escaping (_ result: Result<CityDetail, APIServiceError>) -> Void) {
-        
     }
     
     private func fetchCityDetails(for searchText: String, completionHandler: @escaping (_ result: Result<CityDetail, APIServiceError>) -> Void) {

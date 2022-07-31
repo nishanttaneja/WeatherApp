@@ -6,11 +6,13 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol WeatherViewViewModelDelegate: NSObjectProtocol {
     func willFetchWeather()
     func didUpdateWeather()
     func didFail(with error: APIServiceError)
+    func willFetchCurrentLocation()
 }
 
 protocol WeatherViewViewModelProtocol {
@@ -20,10 +22,13 @@ protocol WeatherViewViewModelProtocol {
     func getNumberOfItems(atSection index: Int) -> Int
     func getHourlyWeather(at index: Int) -> HourlyWeatherDetail?
     func getWeatherDetail(forDayAt index: Int) -> WeatherDetail?
+    
+    func fetchWeatherForCurrentLocation()
 }
 
 class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     private var weatherManager = WeatherManager.shared
+    private let locationManager = CLLocationManager()
     
     weak var delegate: WeatherViewViewModelDelegate? = nil
     
@@ -32,7 +37,7 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     override init() {
         super.init()
         weatherManager.delegate = self
-        
+        locationManager.delegate = self
     }
     
     func getTodaysWeather() -> TodayWeatherDetail? {
@@ -70,6 +75,16 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
         let day = forecast.Date.components(separatedBy: "T").first?.components(separatedBy: "-").last ?? ""
         return .init(day: day, condition: forecast.Day.IconPhrase, minTemp: "\(Int(forecast.Temperature.Minimum.Value))", maxTemp: "\(Int(forecast.Temperature.Maximum.Value))")
     }
+    
+    func fetchWeatherForCurrentLocation() {
+        guard locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways else {
+            locationManager.requestWhenInUseAuthorization()
+            fetchWeatherForCurrentLocation()
+            return
+        }
+        delegate?.willFetchCurrentLocation()
+        locationManager.startUpdatingLocation()
+    }
 }
 
 
@@ -93,5 +108,20 @@ extension WeatherViewViewModel: WeatherManagerServiceDelegate {
         DispatchQueue.main.async {
             self.delegate?.didFail(with: error)
         }
+    }
+}
+
+
+// MARK: - CLLocationManagerDelegate
+
+extension WeatherViewViewModel: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        delegate?.didFail(with: .didFail(with: error))
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let coordinate = locations.first?.coordinate else { return }
+        locationManager.stopUpdatingLocation()
+        weatherManager.fetchWeather(forLocation: coordinate)
     }
 }

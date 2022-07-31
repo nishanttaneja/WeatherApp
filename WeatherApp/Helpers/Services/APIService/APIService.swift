@@ -19,7 +19,7 @@ final class APIService<T: Decodable> {
         self.endpointUrlString = endpointUrlString
     }
     
-    func fetchResponse(appendingString text: String, withParameters params: [URLQueryItem], completionHandler: @escaping (_ result: Result<T, APIServiceError>) -> Void) {
+    func fetchResponse(appendingString text: String = "", withParameters params: [URLQueryItem], completionHandler: @escaping (_ result: Result<T, APIServiceError>) -> Void) {
         guard let url = URL(string: baseUrlString + endpointUrlString + text),
               var components = URLComponents(url: url, resolvingAgainstBaseURL: true) else {
             completionHandler(.failure(.invalidUrl))
@@ -57,7 +57,7 @@ extension APIService {
     static var fiveDayForecast: APIService<DailyWeather> {
         APIService<DailyWeather>(endpointUrlString: "/forecasts/v1/daily/5day")
     }
-//    static var searchCity: APIService<DailyWeather> {
-//        APIService<DailyWeather>(endpointUrlString: "/locations/v1/cities/search")
-//    }
+    static var searchGeoPosition: APIService<CityDetail> {
+        APIService<CityDetail>(endpointUrlString: "/locations/v1/cities/geopositon/search")
+    }
 }
