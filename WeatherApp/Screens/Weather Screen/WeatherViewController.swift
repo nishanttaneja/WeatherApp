@@ -9,6 +9,7 @@ import UIKit
 
 final class WeatherViewController: CustomViewController {
     private let itemSpacing: CGFloat = .zero
+    private let toolBarHeight: CGFloat = 44
     
     private let backgroundView = WeatherBackgroundView()
     private let titleView = WeatherTitleView()
@@ -27,9 +28,26 @@ final class WeatherViewController: CustomViewController {
         return stackView
     }()
     private let visualEffectView = UIVisualEffectView()
+    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
+    private lazy var bottomToolBar: UIToolbar = {
+        let bar = UIToolbar(frame: .init(origin: .zero, size: .init(width: view.frame.width, height: toolBarHeight)))
+        let currentLocationItem = UIBarButtonItem(image: UIImage(systemName: "location"), style: .plain, target: self, action: #selector(handleAction(ofCurrentLocation:)))
+        let locationListItem = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .plain, target: self, action: #selector(handleAction(ofLocationList:)))
+        bar.setItems([currentLocationItem, UIBarButtonItem.flexibleSpace(), locationListItem], animated: true)
+        return bar
+    }()
+    
+    weak var coordinator: WeatherViewCoordinator? = nil
     
     private var viewModel: WeatherViewViewModelProtocol? = nil
-    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
+    
+    @objc private func handleAction(ofCurrentLocation button: UIBarButtonItem) {
+        viewModel?.fetchWeatherForCurrentLocation()
+    }
+    
+    @objc private func handleAction(ofLocationList button: UIBarButtonItem) {
+        coordinator?.didSelectLocationListButton()
+    }
     
     override func config() {
         super.config()
@@ -40,6 +58,7 @@ final class WeatherViewController: CustomViewController {
         visualEffectView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(backgroundView)
         view.addSubview(stackView)
+        view.addSubview(bottomToolBar)
         view.addSubview(visualEffectView)
         view.addSubview(activityIndicatorView)
         NSLayoutConstraint.activate([
@@ -194,15 +213,19 @@ extension WeatherViewController {
         super.viewDidLayoutSubviews()
         activityIndicatorView.frame.size = .init(width: 60, height: 60)
         activityIndicatorView.center = view.center
+        let toolBarHeight = self.toolBarHeight + view.safeAreaInsets.bottom
+        let barSize = CGSize(width: view.frame.width, height: toolBarHeight)
+        bottomToolBar.frame.origin = .init(x: .zero, y: view.frame.height-toolBarHeight)
+        bottomToolBar.frame.size = bottomToolBar.sizeThatFits(barSize)
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setView(isAnimating: true)
-        viewModel?.fetchWeatherForCurrentLocation()
-        if let todaysWeather = viewModel?.getTodaysWeather() {
-            titleView.setWeather(todaysWeather)
-        }
+//        setView(isAnimating: true)
+//        viewModel?.fetchWeatherForCurrentLocation()
+//        if let todaysWeather = viewModel?.getTodaysWeather() {
+//            titleView.setWeather(todaysWeather)
+//        }
     }
 }
 
