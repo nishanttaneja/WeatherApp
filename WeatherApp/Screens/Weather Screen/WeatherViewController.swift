@@ -209,6 +209,7 @@ extension WeatherViewController: WeatherViewViewModelDelegate {
         debugPrint(#function)
         if let todaysWeather = viewModel?.getTodaysWeather() {
             titleView.setWeather(todaysWeather)
+            backgroundView.updateImage(for: todaysWeather.condition)
         }
         collectionView.reloadData()
     }

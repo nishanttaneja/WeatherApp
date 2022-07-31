@@ -36,6 +36,8 @@
 		B482697328969F28003B3014 /* APIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B482697228969F28003B3014 /* APIService.swift */; };
 		B48269752896A63A003B3014 /* DailyWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48269742896A63A003B3014 /* DailyWeather.swift */; };
 		B48269772896A7A4003B3014 /* HourlyForecast.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48269762896A7A4003B3014 /* HourlyForecast.swift */; };
+		B48269792896BDA7003B3014 /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B48269782896BDA7003B3014 /* String+Extension.swift */; };
+		B482697B2896C225003B3014 /* NamedImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B482697A2896C225003B3014 /* NamedImage.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -70,6 +72,8 @@
 		B482697228969F28003B3014 /* APIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIService.swift; sourceTree = "<group>"; };
 		B48269742896A63A003B3014 /* DailyWeather.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyWeather.swift; sourceTree = "<group>"; };
 		B48269762896A7A4003B3014 /* HourlyForecast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HourlyForecast.swift; sourceTree = "<group>"; };
+		B48269782896BDA7003B3014 /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
+		B482697A2896C225003B3014 /* NamedImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NamedImage.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +145,7 @@
 				B48269452893F8D1003B3014 /* Controllers */,
 				B48269442893F8CC003B3014 /* Views */,
 				B482695528968229003B3014 /* ReusableViews */,
+				B482697A2896C225003B3014 /* NamedImage.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -228,6 +233,7 @@
 			children = (
 				B482696728969AD1003B3014 /* WeatherManager.swift */,
 				B482696B28969EC1003B3014 /* Models */,
+				B48269782896BDA7003B3014 /* String+Extension.swift */,
 			);
 			path = WeatherManager;
 			sourceTree = "<group>";
@@ -318,8 +324,10 @@
 				B482696828969AD1003B3014 /* WeatherManager.swift in Sources */,
 				B46A718C2893E02D001BA289 /* WeatherApp.xcdatamodeld in Sources */,
 				B482694D28967BEB003B3014 /* TodayWeatherView.swift in Sources */,
+				B48269792896BDA7003B3014 /* String+Extension.swift in Sources */,
 				B48269402893F865003B3014 /* CustomViewController.swift in Sources */,
 				B46A71862893E02D001BA289 /* WeatherViewController.swift in Sources */,
+				B482697B2896C225003B3014 /* NamedImage.swift in Sources */,
 				B48269492893FAEF003B3014 /* WeatherBackgroundView.swift in Sources */,
 				B482697028969EEB003B3014 /* WeatherManagerError.swift in Sources */,
 				B48269572896824E003B3014 /* WeatherDayReusableView.swift in Sources */,

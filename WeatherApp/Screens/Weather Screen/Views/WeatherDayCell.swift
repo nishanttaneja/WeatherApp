@@ -13,7 +13,7 @@ final class WeatherDayCell: CustomCollectionViewCell {
     let weatherView = WeatherDayView()
     
     func setWeather(minTemp: String, maxTemp: String, condition: String, forDay day: String) {
-        weatherView.tempImageView.image = .init(systemName: "cloud.sun")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+        weatherView.tempImageView.image = condition.getSymbolImage()?.withRenderingMode(.alwaysOriginal)
         weatherView.dayLabel.text = day
         weatherView.minTemperatureLabel.text = minTemp
         weatherView.maxTemperatureLabel.text = maxTemp

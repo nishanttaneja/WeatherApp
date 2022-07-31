@@ -8,8 +8,23 @@
 import UIKit
 
 class WeatherBackgroundView: CustomView {
+    private let imageView = UIImageView()
+    
+    func updateImage(for condition: String) {
+        imageView.image = condition.getBackgroundImage()
+    }
+    
     override func config() {
         super.config()
-        backgroundColor = .darkGray
+        backgroundColor = .clear
+        imageView.contentMode = .scaleAspectFill
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(imageView)
+        NSLayoutConstraint.activate([
+            imageView.topAnchor.constraint(equalTo: topAnchor),
+            imageView.leftAnchor.constraint(equalTo: leftAnchor),
+            imageView.rightAnchor.constraint(equalTo: rightAnchor),
+            imageView.bottomAnchor.constraint(equalTo: bottomAnchor)
+        ])
     }
 }

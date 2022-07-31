@@ -15,7 +15,7 @@ final class TodayWeatherCell: CustomCollectionViewCell {
     func setTemperature(_ temp: String, condition: String, forTime time: String) {
         weatherView.temperatureLabel.text = temp
         weatherView.timeLabel.text = time
-        weatherView.imageView.image = .init(systemName: "cloud.sun")?.withTintColor(.red, renderingMode: .alwaysOriginal)
+        weatherView.imageView.image = condition.getSymbolImage()?.withRenderingMode(.alwaysOriginal)
     }
     
     override func config() {

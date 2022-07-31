@@ -33,7 +33,6 @@ final class WeatherDayReusableView: CustomCollectionReusableView {
     
     override func config() {
         super.config()
-        backgroundColor = .darkGray
         weatherView.dayLabel.font = .systemFont(ofSize: 20, weight: .semibold)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
