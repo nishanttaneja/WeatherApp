@@ -26,7 +26,7 @@ protocol WeatherManagerService {
     var delegate: WeatherManagerServiceDelegate? { get set }
     
     func fetchWeather(forLocation coordinates: CLLocationCoordinate2D)
-    func fetchWeahter(forLocation city: String)
+    func fetchWeather(forLocation city: String)
 }
 
 final class WeatherManager: WeatherManagerService {
@@ -37,7 +37,8 @@ final class WeatherManager: WeatherManagerService {
     private let currentConditionsAPIService: APIService = .currentConditions
     private let hourlyForecastAPIService: APIService = .hourlyForecast
     private let fiveDayForecastAPIService: APIService = .fiveDayForecast
-    private let citySearchAPIService: APIService = .searchGeoPosition
+    private let coordinateSearchAPIService: APIService = .searchGeoPosition
+    private let citySearchAPIService: APIService = .searchCity
     
     weak var delegate: WeatherManagerServiceDelegate? = nil
     
@@ -58,11 +59,15 @@ final class WeatherManager: WeatherManagerService {
             .init(name: WeatherManagerConstant.kApiKey, value: apiKey),
             .init(name: WeatherManagerConstant.kSearchText, value: "\(coordinates.latitude),\(coordinates.longitude)"),
         ]
-        citySearchAPIService.fetchResponse(withParameters: params, completionHandler: fetchedCityClosure)
+        coordinateSearchAPIService.fetchResponse(withParameters: params, completionHandler: fetchedCityClosure)
     }
     
-    func fetchWeahter(forLocation city: String) {
-        fetchCityDetails(for: city, completionHandler: fetchedCityClosure)
+    func fetchWeather(forLocation city: String) {
+        let params: [URLQueryItem] = [
+            .init(name: WeatherManagerConstant.kApiKey, value: apiKey),
+            .init(name: WeatherManagerConstant.kSearchText, value: city),
+        ]
+        citySearchAPIService.fetchResponse(withParameters: params, completionHandler: fetchedCityClosure)
     }
     
     private func fetchWeather(forCity detail: CityDetail) {
@@ -152,9 +157,5 @@ extension WeatherManager {
             }
             self.dispatchGroup.leave()
         }
-    }
-    
-    private func fetchCityDetails(for searchText: String, completionHandler: @escaping (_ result: Result<CityDetail, APIServiceError>) -> Void) {
-        
     }
 }
