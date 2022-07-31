@@ -19,7 +19,7 @@ extension String {
         case "rain":
             return .init(systemName: "cloud.rain.fill")
         default:
-            return .init(systemName: "cloud.fill")?.withTintColor(.white)
+            return .init(systemName: "cloud.sun.fill")
         }
     }
     

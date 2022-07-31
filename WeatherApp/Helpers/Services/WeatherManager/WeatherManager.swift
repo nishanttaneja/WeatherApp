@@ -32,7 +32,7 @@ final class WeatherManager: WeatherManagerService {
     static let shared: WeatherManagerService = WeatherManager()
     private init() {}
     
-    private let apiKey = "L2qDHC76QoM6GbLe8S6qXdioYWVpNSbP"
+    private let apiKey = "lZOzRCkgpAAkTyqVu342hqtWfSKVUWAj"
     private let currentConditionsAPIService: APIService = .currentConditions
     private let hourlyForecastAPIService: APIService = .hourlyForecast
     private let fiveDayForecastAPIService: APIService = .fiveDayForecast
@@ -65,13 +65,13 @@ final class WeatherManager: WeatherManagerService {
     }
     
     private func fetchWeather(forCity detail: CityDetail) {
-        delegate?.willFetchWeather(forLocation: detail.name)
+        delegate?.willFetchWeather(forLocation: detail.LocalizedName)
         fetchWeather(forCity: detail, completionHandler: { [weak self] result in
             switch result {
             case .failure(let error):
                 self?.delegate?.didFail(with: error)
             case .success(let weather):
-                self?.delegate?.didFetchWeather(weather, forLocation: detail.name)
+                self?.delegate?.didFetchWeather(weather, forLocation: detail.LocalizedName)
             }
         })
 

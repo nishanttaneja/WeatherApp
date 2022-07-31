@@ -40,6 +40,7 @@ final class APIService<T: Decodable> {
                 let decodedData = try self.jsonDecoder.decode(T.self, from: data!)
                 completionHandler(.success(decodedData))
             } catch {
+                debugPrint(String(data: data!, encoding: .utf8))
                 completionHandler(.failure(.didFail(with: error)))
             }
         }
@@ -58,6 +59,6 @@ extension APIService {
         APIService<DailyWeather>(endpointUrlString: "/forecasts/v1/daily/5day")
     }
     static var searchGeoPosition: APIService<CityDetail> {
-        APIService<CityDetail>(endpointUrlString: "/locations/v1/cities/geopositon/search")
+        APIService<CityDetail>(endpointUrlString: "/locations/v1/cities/geoposition/search")
     }
 }

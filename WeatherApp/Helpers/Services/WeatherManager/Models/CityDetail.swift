@@ -11,9 +11,3 @@ struct CityDetail: Decodable {
     let Key: String
     let LocalizedName: String
 }
-
-extension CityDetail {
-    var name: String {
-        LocalizedName
-    }
-}
