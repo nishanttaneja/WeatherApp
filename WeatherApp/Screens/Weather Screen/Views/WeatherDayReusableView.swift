@@ -8,12 +8,22 @@
 import UIKit
 
 final class WeatherDayReusableView: CustomCollectionReusableView {
-    private let padding = UIEdgeInsets(top: 4, left: 24, bottom: 4, right: 24)
-
     let weatherView = WeatherDayView()
+    private let separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        return view
+    }()
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [weatherView, separatorView])
+        stackView.axis = .vertical
+        return stackView
+    }()
     
     func setWeather(minTemp: String, maxTemp: String, forDay day: String) {
-        weatherView.tempImageView.image = .init(systemName: "cloud.sun")?.withTintColor(.white, renderingMode: .alwaysOriginal)
+        weatherView.tempImageView.removeFromSuperview()
         weatherView.dayLabel.text = day
         weatherView.minTemperatureLabel.text = minTemp
         weatherView.maxTemperatureLabel.text = maxTemp
@@ -23,13 +33,15 @@ final class WeatherDayReusableView: CustomCollectionReusableView {
     
     override func config() {
         super.config()
-        weatherView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(weatherView)
+        backgroundColor = .darkGray
+        weatherView.dayLabel.font = .systemFont(ofSize: 20, weight: .semibold)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(stackView)
         NSLayoutConstraint.activate([
-            weatherView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding.top),
-            weatherView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: padding.left),
-            weatherView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -padding.right),
-            weatherView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding.bottom)
+            stackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
+            stackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor),
+            stackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
+            stackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor)
         ])
     }
 }

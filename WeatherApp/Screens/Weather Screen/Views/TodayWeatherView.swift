@@ -9,7 +9,6 @@ import UIKit
 
 final class TodayWeatherView: CustomView {
     static private let labelHeight: CGFloat = 14
-    static private let padding = UIEdgeInsets(top: 4, left: 4, bottom: 4, right: 4)
     
     let timeLabel: UILabel = {
         let label = UILabel()
@@ -48,12 +47,11 @@ final class TodayWeatherView: CustomView {
         super.config()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
-        let padding: UIEdgeInsets = Self.padding
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: topAnchor, constant: padding.top),
-            stackView.leftAnchor.constraint(equalTo: leftAnchor, constant: padding.left),
-            stackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -padding.right),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding.bottom)
+            stackView.topAnchor.constraint(equalTo: topAnchor),
+            stackView.leftAnchor.constraint(equalTo: leftAnchor),
+            stackView.rightAnchor.constraint(equalTo: rightAnchor),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
     }
 }

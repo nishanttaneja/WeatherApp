@@ -8,6 +8,7 @@
 import UIKit
 
 final class WeatherDayView: CustomView {
+    private let padding = UIEdgeInsets(top: 4, left: 16, bottom: 4, right: 16)
     private let itemSpacing: CGFloat = 20
     
     
@@ -22,6 +23,8 @@ final class WeatherDayView: CustomView {
     let tempImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.widthAnchor.constraint(equalToConstant: 32).isActive = true
         return imageView
     }()
     let minTemperatureLabel: UILabel = {
@@ -57,10 +60,10 @@ final class WeatherDayView: CustomView {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(stackView)
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: topAnchor),
-            stackView.leftAnchor.constraint(equalTo: leftAnchor),
-            stackView.rightAnchor.constraint(equalTo: rightAnchor),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            stackView.topAnchor.constraint(equalTo: topAnchor, constant: padding.top),
+            stackView.leftAnchor.constraint(equalTo: leftAnchor, constant: padding.left),
+            stackView.rightAnchor.constraint(equalTo: rightAnchor, constant: -padding.right),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding.bottom)
         ])
     }
 }

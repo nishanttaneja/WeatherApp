@@ -8,6 +8,7 @@
 import UIKit
 
 final class TodayWeatherCell: CustomCollectionViewCell {
+    private let padding = UIEdgeInsets(top: 8, left: 4, bottom: 8, right: 4)
     
     private let weatherView = TodayWeatherView()
     
@@ -22,10 +23,10 @@ final class TodayWeatherCell: CustomCollectionViewCell {
         weatherView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(weatherView)
         NSLayoutConstraint.activate([
-            weatherView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor),
-            weatherView.leftAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leftAnchor),
-            weatherView.rightAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.rightAnchor),
-            weatherView.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor)
+            weatherView.topAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.topAnchor, constant: padding.top),
+            weatherView.leftAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.leftAnchor, constant: padding.left),
+            weatherView.rightAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.rightAnchor, constant: -padding.right),
+            weatherView.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor, constant: -padding.bottom)
         ])
     }
 }

@@ -8,7 +8,7 @@
 import UIKit
 
 final class WeatherViewController: CustomViewController {
-    private let itemSpacing: CGFloat = 16
+    private let itemSpacing: CGFloat = .zero
     
     private let backgroundView = WeatherBackgroundView()
     private let titleView: WeatherTitleView = {
@@ -16,9 +16,16 @@ final class WeatherViewController: CustomViewController {
         titleView.setWeather(temperature: "68°", condition: "Partly Cloudy", forCity: "New York")
         return titleView
     }()
+    private let separatorView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .lightGray
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        return view
+    }()
     private var collectionView: UICollectionView! = nil
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleView])
+        let stackView = UIStackView(arrangedSubviews: [titleView, separatorView])
         stackView.axis = .vertical
         stackView.spacing = itemSpacing
         return stackView
@@ -53,6 +60,7 @@ extension WeatherViewController: UICollectionViewDataSource {
     // Cell Reuse IDs
     static private let defaultCellReuseId = "WeatherViewController_CollectionViewCell_Default"
     static private let todayWeatherCellReuseId = "WeatherViewController_TodayWeatherViewCell_CustomCollectionViewCell"
+    static private let weatherDayCellReuseId = "WeatherViewController_WeatherDayCell_CustomCollectionViewCell"
     // SupplementaryView Reuse IDs
     static private let defaultSupplementaryViewReuseId = "WeatherViewController_SupplementaryView_Default"
     static private let weatherDayReusableViewReuseId = "WeatherViewController_WeatherDayReusableView_CustomCollectionReusableView"
@@ -71,16 +79,16 @@ extension WeatherViewController: UICollectionViewDataSource {
     private func getGroupSize(forSection kind: WeatherViewSectionKind?) -> NSCollectionLayoutSize {
         switch kind {
         case .today:
-            return .init(widthDimension: .absolute(80), heightDimension: .absolute(120))
+            return .init(widthDimension: .absolute(56), heightDimension: .absolute(144))
         case .nextTenDays:
-            return .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(60))
+            return .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(44))
         default:
             return .init(widthDimension: .estimated(100), heightDimension: .estimated(100))
         }
     }
     
     private func getCollectionViewCompositionalLayout() -> UICollectionViewCompositionalLayout {
-        let supplementaryItemHeight: CGFloat = 32
+        let supplementaryItemHeight: CGFloat = 44
         let layout = UICollectionViewCompositionalLayout { sectionNumber, _ in
             let sectionKind = WeatherViewSectionKind(rawValue: sectionNumber)
             let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
@@ -90,24 +98,21 @@ extension WeatherViewController: UICollectionViewDataSource {
             let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
             group.contentInsets = .init(top: sectionKind == .today ? supplementaryItemHeight+4 : 4, leading: 4, bottom: 4, trailing: 4)
             let section = NSCollectionLayoutSection(group: group)
+            let supItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(sectionKind == .today ? 44 : 1))
+            let anchor = NSCollectionLayoutAnchor(edges: .top)
+            let supItem = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: supItemSize, elementKind: UICollectionView.elementKindSectionHeader, containerAnchor: anchor)
+            section.boundarySupplementaryItems = [supItem]
             if sectionKind == .today {
-                let supItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(supplementaryItemHeight))
-                let anchor = NSCollectionLayoutAnchor(edges: .top)
-                let supItem = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: supItemSize, elementKind: UICollectionView.elementKindSectionHeader, containerAnchor: anchor)
-                section.boundarySupplementaryItems = [supItem]
                 section.orthogonalScrollingBehavior = .continuous
             }
-            let supItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(1))
-            let anchor = NSCollectionLayoutAnchor(edges: .bottom)
-            let supItem = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: supItemSize, elementKind: UICollectionView.elementKindSectionFooter, containerAnchor: anchor)
-            section.boundarySupplementaryItems.append(supItem)
+//            supItem.pinToVisibleBounds = true
             return section
         }
         return layout
     }
     
     private func getCollectionViewLayout() -> UICollectionViewLayout {
-//        getCollectionViewFlowLayout()
+        //        getCollectionViewFlowLayout()
         getCollectionViewCompositionalLayout()
     }
     
@@ -117,6 +122,7 @@ extension WeatherViewController: UICollectionViewDataSource {
         collectionView.backgroundColor = .clear
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Self.defaultCellReuseId)
         collectionView.register(TodayWeatherCell.self, forCellWithReuseIdentifier: Self.todayWeatherCellReuseId)
+        collectionView.register(WeatherDayCell.self, forCellWithReuseIdentifier: Self.weatherDayCellReuseId)
         collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Self.defaultSupplementaryViewReuseId)
         collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionFooter, withReuseIdentifier: Self.defaultSupplementaryViewReuseId)
         collectionView.register(WeatherDayReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Self.weatherDayReusableViewReuseId)
@@ -144,21 +150,28 @@ extension WeatherViewController: UICollectionViewDataSource {
             todayWeatherCell.setTemperature("\(68-indexPath.item)", forTime: "\(indexPath.item)")
             return todayWeatherCell
         case .nextTenDays:
-            cell.backgroundColor = .systemBlue
-            return cell
+            guard let weatherDayCell = collectionView.dequeueReusableCell(withReuseIdentifier: Self.weatherDayCellReuseId, for: indexPath) as? WeatherDayCell else { return cell }
+            weatherDayCell.setWeather(minTemp: "\(70-indexPath.item)", maxTemp: "\(80-indexPath.item)", forDay: "Day \(indexPath.item+1)")
+            return weatherDayCell
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let supView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.defaultSupplementaryViewReuseId, for: indexPath)
-        guard kind == UICollectionView.elementKindSectionHeader,
-              let weatherDayView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.weatherDayReusableViewReuseId, for: indexPath) as? WeatherDayReusableView else {
+        guard kind == UICollectionView.elementKindSectionHeader, let sectionKind = WeatherViewSectionKind(rawValue: indexPath.section) else { return supView }
+        switch sectionKind {
+        case .today:
+            guard let weatherDayView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.weatherDayReusableViewReuseId, for: indexPath) as? WeatherDayReusableView else {
+                supView.backgroundColor = .lightGray
+                return supView
+            }
+            weatherDayView.setWeather(minTemp: "\(72-indexPath.item)", maxTemp: "\(84-indexPath.item)", forDay: "Day \(indexPath.item)")
+            return weatherDayView
+        case .nextTenDays:
             supView.backgroundColor = .lightGray
             return supView
         }
-        weatherDayView.setWeather(minTemp: "\(72-indexPath.item)", maxTemp: "\(84-indexPath.item)", forDay: "Day \(indexPath.item)")
-        weatherDayView.weatherView.dayLabel.font = .systemFont(ofSize: 20, weight: .semibold)
-        weatherDayView.weatherView.tempImageView.isHidden = true
-        return weatherDayView
+        
+        
     }
 }

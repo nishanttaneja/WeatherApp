@@ -8,7 +8,11 @@
 import UIKit
 
 class TitleView: CustomView {
-    let fixedHeight: CGFloat = 60
+    class func getPadding() -> UIEdgeInsets {
+        UIEdgeInsets(top: .zero, left: .zero, bottom: .zero, right: .zero)
+    }
+    
+//    let fixedHeight: CGFloat = 60
     let itemSpacing: CGFloat = 2
     
     let titleLabel: UILabel = {
@@ -37,12 +41,12 @@ class TitleView: CustomView {
         super.config()
         titleStackView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(titleStackView)
+        let padding: UIEdgeInsets = Self.getPadding()
         NSLayoutConstraint.activate([
-            titleStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor),
-            titleStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor),
-            titleStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor),
-            titleStackView.heightAnchor.constraint(equalToConstant: fixedHeight),
-            titleStackView.heightAnchor.constraint(equalTo: heightAnchor)
+            titleStackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: padding.top),
+            titleStackView.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: padding.left),
+            titleStackView.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -padding.right),
+            titleStackView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -padding.bottom)
         ])
     }
 }
