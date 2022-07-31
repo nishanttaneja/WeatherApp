@@ -12,13 +12,24 @@ final class WeatherTitleView: TitleView {
         UIEdgeInsets(top: .zero, left: .zero, bottom: 16, right: .zero)
     }
     
+    let tempLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 72)
+        label.textColor = .white
+        label.textAlignment = .center
+        return label
+    }()
+    
     func setWeather(temperature: String, condition: String, forCity cityName: String) {
         titleLabel.text = cityName
-        subtitleLabel.text = temperature + " | " + condition
+        subtitleLabel.text = condition
+        tempLabel.text = temperature
     }
     
     override func config() {
         super.config()
+        stackView.spacing = 4
+        stackView.addArrangedSubview(tempLabel)
     }
 }
 
