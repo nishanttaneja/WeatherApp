@@ -26,15 +26,22 @@ final class WeatherViewController: CustomViewController {
         stackView.spacing = itemSpacing
         return stackView
     }()
+    private let visualEffectView = UIVisualEffectView()
     
     private var viewModel: WeatherViewViewModelProtocol? = nil
+    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
     
     override func config() {
         super.config()
+        activityIndicatorView.frame = .zero
+        visualEffectView.isUserInteractionEnabled = false
         backgroundView.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        visualEffectView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(backgroundView)
         view.addSubview(stackView)
+        view.addSubview(visualEffectView)
+        view.addSubview(activityIndicatorView)
         NSLayoutConstraint.activate([
             // BackgroundView
             backgroundView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -45,7 +52,12 @@ final class WeatherViewController: CustomViewController {
             stackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             stackView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
             stackView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
-            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            // VisualEffectView
+            visualEffectView.topAnchor.constraint(equalTo: view.topAnchor),
+            visualEffectView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            visualEffectView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            visualEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         configCollectionView()
     }
@@ -163,28 +175,30 @@ extension WeatherViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         let supView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.defaultSupplementaryViewReuseId, for: indexPath)
-        guard kind == UICollectionView.elementKindSectionHeader, let sectionKind = WeatherViewSectionKind(rawValue: indexPath.section) else { return supView }
-        switch sectionKind {
-        case .today:
-            guard let weatherDayView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.weatherDayReusableViewReuseId, for: indexPath) as? WeatherDayReusableView, let todaysWeather = viewModel?.getTodaysWeather() else {
-                supView.backgroundColor = .lightGray
-                return supView
-            }
-            weatherDayView.setTodaysWeather(todaysWeather)
-            return weatherDayView
-        case .nextTenDays:
-            supView.backgroundColor = .lightGray
+        guard kind == UICollectionView.elementKindSectionHeader,
+              WeatherViewSectionKind(rawValue: indexPath.section) == .today,
+              let weatherDayView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.weatherDayReusableViewReuseId, for: indexPath) as? WeatherDayReusableView,
+              let todaysWeather = viewModel?.getTodaysWeather() else {
             return supView
         }
+        weatherDayView.setTodaysWeather(todaysWeather)
+        return weatherDayView
     }
 }
 
 
 // MARK: - View Lifecycle
 
-extension WeatherViewController {    
+extension WeatherViewController {
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        activityIndicatorView.frame.size = .init(width: 60, height: 60)
+        activityIndicatorView.center = view.center
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        setView(isAnimating: true)
         if let todaysWeather = viewModel?.getTodaysWeather() {
             titleView.setWeather(todaysWeather)
         }
@@ -196,21 +210,35 @@ extension WeatherViewController {
 
 extension WeatherViewController: WeatherViewViewModelDelegate {
     func willFetchWeather() {
-        // Start Loading animation
-        debugPrint(#function)
+        setView(isAnimating: true)
     }
     
     func didFail(with error: APIServiceError) {
-        // Display Error Message
-        debugPrint(#function)
+        let alertController = UIAlertController(title: error.title, message: error.message, preferredStyle: .alert)
+        alertController.addAction(.init(title: "Dismiss", style: .cancel))
+        present(alertController, animated: true)
+        setView(isAnimating: false)
     }
     
     func didUpdateWeather() {
-        debugPrint(#function)
         if let todaysWeather = viewModel?.getTodaysWeather() {
             titleView.setWeather(todaysWeather)
             backgroundView.updateImage(for: todaysWeather.condition)
         }
         collectionView.reloadData()
+        setView(isAnimating: false)
+    }
+}
+
+
+// MARK: - Loading Animation
+
+extension WeatherViewController {
+    private func setView(isAnimating: Bool) {
+        visualEffectView.isUserInteractionEnabled = isAnimating
+        UIView.animate(withDuration: 0.4) {
+            isAnimating ? self.activityIndicatorView.startAnimating() : self.activityIndicatorView.stopAnimating()
+            self.visualEffectView.effect = isAnimating ? UIBlurEffect(style: .dark) : nil
+        }
     }
 }

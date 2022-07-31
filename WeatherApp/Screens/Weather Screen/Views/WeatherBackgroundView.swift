@@ -16,7 +16,8 @@ class WeatherBackgroundView: CustomView {
     
     override func config() {
         super.config()
-        backgroundColor = .clear
+        backgroundColor = .darkGray
+        updateImage(for: "sunny")
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(imageView)

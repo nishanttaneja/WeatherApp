@@ -106,7 +106,7 @@ extension WeatherManager {
             switch result {
             case .success(let currentWeather):
                 guard let currentCondition = currentWeather.first else { break }
-                self.weather.feelsLikeTemp = "\(currentCondition.Temperature.Metric.Value))°"
+                self.weather.feelsLikeTemp = "\(Int(currentCondition.Temperature.Metric.Value))°"
                 self.weather.condition = currentCondition.WeatherText
                 self.weather.minTemp = "\(Int(currentCondition.TemperatureSummary.Past6HourRange.Minimum.Metric.Value))"
                 self.weather.maxTemp = "\(Int(currentCondition.TemperatureSummary.Past6HourRange.Maximum.Metric.Value))"
