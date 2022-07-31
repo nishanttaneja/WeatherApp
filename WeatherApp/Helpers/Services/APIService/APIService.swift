@@ -7,19 +7,6 @@
 
 import Foundation
 
-struct APIServiceError: Error {
-    let title: String
-    let message: String
-}
-
-extension APIServiceError {
-    static let invalidUrl = APIServiceError(title: "Invalid Request", message: "Try again later.")
-    static let unableToFetchData = APIServiceError(title: "Server Error", message: "some error occurred")
-    static func didFail(with error: Error) -> APIServiceError {
-        APIServiceError(title: "unknown error", message: error.localizedDescription)
-    }
-}
-
 final class APIService<T: Decodable> {
     private let baseUrlString = "https://dataservice.accuweather.com"
     
@@ -70,4 +57,7 @@ extension APIService {
     static var fiveDayForecast: APIService<DailyWeather> {
         APIService<DailyWeather>(endpointUrlString: "/forecasts/v1/daily/5day")
     }
+//    static var searchCity: APIService<DailyWeather> {
+//        APIService<DailyWeather>(endpointUrlString: "/locations/v1/cities/search")
+//    }
 }
