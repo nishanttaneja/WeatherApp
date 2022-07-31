@@ -50,7 +50,10 @@ final class WeatherViewController: CustomViewController {
 // MARK: - CollectionView
 
 extension WeatherViewController: UICollectionViewDataSource {
+    // Cell Reuse IDs
     static private let defaultCellReuseId = "WeatherViewController_CollectionViewCell_Default"
+    static private let todayWeatherCellReuseId = "WeatherViewController_TodayWeatherViewCell_CustomCollectionViewCell"
+    // SupplementaryView Reuse IDs
     static private let defaultSupplementaryViewReuseId = "WeatherViewController_SupplementaryView_Default"
     
     enum WeatherViewSectionKind: Int {
@@ -106,8 +109,9 @@ extension WeatherViewController: UICollectionViewDataSource {
     private func configCollectionView() {
         let layout = getCollectionViewLayout()
         collectionView = .init(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .green
+        collectionView.backgroundColor = .clear
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Self.defaultCellReuseId)
+        collectionView.register(TodayWeatherCell.self, forCellWithReuseIdentifier: Self.todayWeatherCellReuseId)
         collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Self.defaultSupplementaryViewReuseId)
         collectionView.dataSource = self
         stackView.addArrangedSubview(collectionView)
@@ -126,8 +130,16 @@ extension WeatherViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cellId: String = Self.defaultCellReuseId
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
-        cell.backgroundColor = .systemBlue
-        return cell
+        guard let sectionKind = WeatherViewSectionKind(rawValue: indexPath.section) else { return cell }
+        switch sectionKind {
+        case .today:
+            guard let todayWeatherCell = collectionView.dequeueReusableCell(withReuseIdentifier: Self.todayWeatherCellReuseId, for: indexPath) as? TodayWeatherCell else { return cell }
+            todayWeatherCell.setTemperature("\(68-indexPath.item)", forTime: "\(indexPath.item)")
+            return todayWeatherCell
+        case .nextTenDays:
+            cell.backgroundColor = .systemBlue
+            return cell
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
