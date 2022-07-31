@@ -13,7 +13,7 @@ final class WeatherViewController: CustomViewController {
     private let backgroundView = WeatherBackgroundView()
     private let titleView: WeatherTitleView = {
         let titleView = WeatherTitleView()
-        titleView.setWeather(temperature: "29°", condition: "Cloudy", forCity: "New Delhi")
+        titleView.setWeather(temperature: "68°", condition: "Partly Cloudy", forCity: "New York")
         return titleView
     }()
     private var collectionView: UICollectionView! = nil
@@ -50,7 +50,13 @@ final class WeatherViewController: CustomViewController {
 // MARK: - CollectionView
 
 extension WeatherViewController: UICollectionViewDataSource {
-    static private let defaultCellReuseId = "WeatherViewController_defaultCell"
+    static private let defaultCellReuseId = "WeatherViewController_CollectionViewCell_Default"
+    static private let defaultSupplementaryViewReuseId = "WeatherViewController_SupplementaryView_Default"
+    
+    enum WeatherViewSectionKind: Int {
+        case today, nextTenDays
+    }
+    
     private func getCollectionViewFlowLayout() -> UICollectionViewFlowLayout {
         let flowLayout = UICollectionViewFlowLayout()
         flowLayout.scrollDirection = .vertical
@@ -58,8 +64,43 @@ extension WeatherViewController: UICollectionViewDataSource {
         return flowLayout
     }
     
+    private func getGroupSize(forSection kind: WeatherViewSectionKind?) -> NSCollectionLayoutSize {
+        switch kind {
+        case .today:
+            return .init(widthDimension: .absolute(80), heightDimension: .absolute(120))
+        case .nextTenDays:
+            return .init(widthDimension: .fractionalWidth(1), heightDimension: .absolute(60))
+        default:
+            return .init(widthDimension: .estimated(100), heightDimension: .estimated(100))
+        }
+    }
+    
+    private func getCollectionViewCompositionalLayout() -> UICollectionViewCompositionalLayout {
+        let supplementaryItemHeight: CGFloat = 32
+        let layout = UICollectionViewCompositionalLayout { sectionNumber, _ in
+            let sectionKind = WeatherViewSectionKind(rawValue: sectionNumber)
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .fractionalHeight(1))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = .init(top: .zero, leading: 4, bottom: .zero, trailing: 4)
+            let groupSize: NSCollectionLayoutSize = self.getGroupSize(forSection: sectionKind)
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+            group.contentInsets = .init(top: sectionKind == .today ? supplementaryItemHeight+4 : 4, leading: 4, bottom: 4, trailing: 4)
+            let section = NSCollectionLayoutSection(group: group)
+            if sectionKind == .today {
+                let supItemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1), heightDimension: .absolute(supplementaryItemHeight))
+                let anchor = NSCollectionLayoutAnchor(edges: .top)
+                let supItem = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: supItemSize, elementKind: UICollectionView.elementKindSectionHeader, containerAnchor: anchor)
+                section.boundarySupplementaryItems = [supItem]
+                section.orthogonalScrollingBehavior = .continuous
+            }
+            return section
+        }
+        return layout
+    }
+    
     private func getCollectionViewLayout() -> UICollectionViewLayout {
-        getCollectionViewFlowLayout()
+//        getCollectionViewFlowLayout()
+        getCollectionViewCompositionalLayout()
     }
     
     private func configCollectionView() {
@@ -67,14 +108,19 @@ extension WeatherViewController: UICollectionViewDataSource {
         collectionView = .init(frame: .zero, collectionViewLayout: layout)
         collectionView.backgroundColor = .green
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: Self.defaultCellReuseId)
+        collectionView.register(UICollectionReusableView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Self.defaultSupplementaryViewReuseId)
         collectionView.dataSource = self
         stackView.addArrangedSubview(collectionView)
     }
     
     // MARK: DataSource
     
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        2
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        10
+        12
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -82,5 +128,11 @@ extension WeatherViewController: UICollectionViewDataSource {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: cellId, for: indexPath)
         cell.backgroundColor = .systemBlue
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        let supView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.defaultSupplementaryViewReuseId, for: indexPath)
+        supView.backgroundColor = .orange
+        return supView
     }
 }
