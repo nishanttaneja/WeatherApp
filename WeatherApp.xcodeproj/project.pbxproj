@@ -43,6 +43,10 @@
 		B4ABB4032896ECE000DBA5E6 /* LocationListViewCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABB4022896ECE000DBA5E6 /* LocationListViewCoordinator.swift */; };
 		B4ABB4052896ECE700DBA5E6 /* LocationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABB4042896ECE700DBA5E6 /* LocationListViewController.swift */; };
 		B4ABB4072896EF4F00DBA5E6 /* LocationListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABB4062896EF4F00DBA5E6 /* LocationListViewModel.swift */; };
+		B4ABB40A2896FBF100DBA5E6 /* CoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABB4092896FBF100DBA5E6 /* CoreDataService.swift */; };
+		B4ABB40C2896FE4B00DBA5E6 /* LocationCoreDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABB40B2896FE4B00DBA5E6 /* LocationCoreDataService.swift */; };
+		B4ABB40E2897058700DBA5E6 /* NSNotification+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABB40D2897058700DBA5E6 /* NSNotification+Extension.swift */; };
+		B4ABB410289705A700DBA5E6 /* LocationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4ABB40F289705A700DBA5E6 /* LocationItem.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -84,6 +88,10 @@
 		B4ABB4022896ECE000DBA5E6 /* LocationListViewCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationListViewCoordinator.swift; sourceTree = "<group>"; };
 		B4ABB4042896ECE700DBA5E6 /* LocationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationListViewController.swift; sourceTree = "<group>"; };
 		B4ABB4062896EF4F00DBA5E6 /* LocationListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationListViewModel.swift; sourceTree = "<group>"; };
+		B4ABB4092896FBF100DBA5E6 /* CoreDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataService.swift; sourceTree = "<group>"; };
+		B4ABB40B2896FE4B00DBA5E6 /* LocationCoreDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationCoreDataService.swift; sourceTree = "<group>"; };
+		B4ABB40D2897058700DBA5E6 /* NSNotification+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSNotification+Extension.swift"; sourceTree = "<group>"; };
+		B4ABB40F289705A700DBA5E6 /* LocationItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationItem.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -159,6 +167,7 @@
 				B48269442893F8CC003B3014 /* Views */,
 				B482695528968229003B3014 /* ReusableViews */,
 				B482697A2896C225003B3014 /* NamedImage.swift */,
+				B4ABB40D2897058700DBA5E6 /* NSNotification+Extension.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -223,6 +232,7 @@
 		B482696628969AC2003B3014 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				B4ABB4082896FBE700DBA5E6 /* CoreDataService */,
 				B482697128969F1E003B3014 /* APIService */,
 				B482696C28969ECB003B3014 /* WeatherManager */,
 			);
@@ -265,8 +275,18 @@
 				B4ABB4022896ECE000DBA5E6 /* LocationListViewCoordinator.swift */,
 				B4ABB4042896ECE700DBA5E6 /* LocationListViewController.swift */,
 				B4ABB4062896EF4F00DBA5E6 /* LocationListViewModel.swift */,
+				B4ABB40F289705A700DBA5E6 /* LocationItem.swift */,
 			);
 			path = "LocationList Screen";
+			sourceTree = "<group>";
+		};
+		B4ABB4082896FBE700DBA5E6 /* CoreDataService */ = {
+			isa = PBXGroup;
+			children = (
+				B4ABB40B2896FE4B00DBA5E6 /* LocationCoreDataService.swift */,
+				B4ABB4092896FBF100DBA5E6 /* CoreDataService.swift */,
+			);
+			path = CoreDataService;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -340,18 +360,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				B4826954289681EA003B3014 /* CustomCollectionReusableView.swift in Sources */,
+				B4ABB40C2896FE4B00DBA5E6 /* LocationCoreDataService.swift in Sources */,
 				B4ABB3FC2896CD6000DBA5E6 /* APIServiceError.swift in Sources */,
 				B482697328969F28003B3014 /* APIService.swift in Sources */,
 				B482696428969A47003B3014 /* WeatherDetail.swift in Sources */,
 				B482695F28969A20003B3014 /* TodayWeatherDetail.swift in Sources */,
 				B48269752896A63A003B3014 /* DailyWeather.swift in Sources */,
 				B482696828969AD1003B3014 /* WeatherManager.swift in Sources */,
+				B4ABB40A2896FBF100DBA5E6 /* CoreDataService.swift in Sources */,
 				B46A718C2893E02D001BA289 /* WeatherApp.xcdatamodeld in Sources */,
 				B482694D28967BEB003B3014 /* TodayWeatherView.swift in Sources */,
 				B48269792896BDA7003B3014 /* String+Extension.swift in Sources */,
 				B48269402893F865003B3014 /* CustomViewController.swift in Sources */,
 				B46A71862893E02D001BA289 /* WeatherViewController.swift in Sources */,
 				B4ABB3FE2896EA2A00DBA5E6 /* AppCoordinator.swift in Sources */,
+				B4ABB410289705A700DBA5E6 /* LocationItem.swift in Sources */,
 				B482697B2896C225003B3014 /* NamedImage.swift in Sources */,
 				B48269492893FAEF003B3014 /* WeatherBackgroundView.swift in Sources */,
 				B48269572896824E003B3014 /* WeatherDayReusableView.swift in Sources */,
@@ -365,6 +388,7 @@
 				B482696E28969EDA003B3014 /* CityDetail.swift in Sources */,
 				B482696A28969EBC003B3014 /* CurrentWeather.swift in Sources */,
 				B46A71842893E02D001BA289 /* SceneDelegate.swift in Sources */,
+				B4ABB40E2897058700DBA5E6 /* NSNotification+Extension.swift in Sources */,
 				B48269472893F8E0003B3014 /* WeatherTitleView.swift in Sources */,
 				B482694F28967D99003B3014 /* TodayWeatherCell.swift in Sources */,
 				B482695B2896896E003B3014 /* WeatherDayCell.swift in Sources */,

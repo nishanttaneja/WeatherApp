@@ -13,7 +13,8 @@ final class WeatherViewCoordinator: NSObject, Coordinator {
     var rootViewController: UIViewController? = nil
     
     func configRootViewController() {
-        let viewModel = WeatherViewViewModel()
+        let storageService: LocationInsertStorageService = LocationCoreDataService()
+        let viewModel = WeatherViewViewModel(storageService: storageService)
         let viewController = WeatherViewController(viewModel: viewModel)
         viewController.coordinator = self
         viewModel.delegate = viewController

@@ -27,6 +27,16 @@ protocol WeatherViewViewModelProtocol {
 }
 
 class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
+    private let storageService: LocationInsertStorageService
+    
+    init(storageService: LocationInsertStorageService) {
+        self.storageService = storageService
+        super.init()
+        weatherManager.delegate = self
+        locationManager.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(didSelectCity(notification:)), name: .selectCity, object: nil)
+    }
+    
     private var weatherManager = WeatherManager.shared
     private let locationManager = CLLocationManager()
     
@@ -34,10 +44,8 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     
     private var weather: Weather? = nil
     
-    override init() {
-        super.init()
-        weatherManager.delegate = self
-        locationManager.delegate = self
+    @objc private func didSelectCity(notification: NSNotification) {
+        debugPrint(notification.object as? String)
     }
     
     func getTodaysWeather() -> TodayWeatherDetail? {
@@ -98,6 +106,10 @@ extension WeatherViewViewModel: WeatherManagerServiceDelegate {
     }
     
     func didFetchWeather(_ data: Weather, forLocation city: String) {
+        if let cityName = data.city {
+            let location = LocationItem(title: cityName)
+            storageService.insertLocation(location, completionHandler: { _ in })
+        }
         DispatchQueue.main.async {
             self.weather = data
             self.delegate?.didUpdateWeather()

@@ -8,13 +8,122 @@
 import UIKit
 
 final class LocationListViewController: CustomViewController {
+    private let tableView = UITableView(frame: .zero, style: .grouped)
+    private let visualEffectView = UIVisualEffectView()
+    private let activityIndicatorView = UIActivityIndicatorView(style: .large)
+    
     weak var coordinator: LocationListViewCoordinator? = nil
     
     private var viewModel: LocationListViewModelProtocol? = nil
     
+    override func config() {
+        super.config()
+        activityIndicatorView.frame = .zero
+        configTableView()
+        configVisualEffectView()
+        view.addSubview(activityIndicatorView)
+    }
+    
     convenience init(viewModel: LocationListViewModelProtocol) {
         self.init(nibName: nil, bundle: nil)
+        self.view.backgroundColor = .darkGray
         self.viewModel = viewModel
-        self.view.backgroundColor = .green
+        title = "Locations"
+    }
+}
+
+
+// MARK: - TableView
+
+extension LocationListViewController: UITableViewDataSource, UITableViewDelegate {
+    static private let defaultCellReuseId = "LocationListViewController_UITableViewCell"
+    
+    private func configTableView() {
+        tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.defaultCellReuseId)
+        tableView.dataSource = self
+    }
+    
+    // MARK: DataSource
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        viewModel?.getNumberOfLocations() ?? .zero
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: Self.defaultCellReuseId, for: indexPath)
+        cell.textLabel?.text = viewModel?.getLocation(at: indexPath.row)?.title
+        return cell
+    }
+    
+    // MARK: Delegate
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        viewModel?.didSelectLocation(at: indexPath.row)
+    }
+}
+
+
+// MARK: - View Lifecycle
+
+extension LocationListViewController {
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        activityIndicatorView.frame.size = .init(width: 60, height: 60)
+        activityIndicatorView.center = view.center
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
+}
+
+
+// MARK: - ViewModelDelegate
+
+extension LocationListViewController: LocationListViewModelDelegate {
+    func willFetchLocations() {
+        setView(isAnimating: true)
+    }
+    
+    func didFetchLocations() {
+        tableView.reloadData()
+        setView(isAnimating: false)
+    }
+    
+    func didFail(withError error: Error) {
+        let alertController = UIAlertController(title: "some error occurred", message: error.localizedDescription, preferredStyle: .alert)
+        alertController.addAction(.init(title: "Dismiss", style: .cancel))
+        present(alertController, animated: true)
+        setView(isAnimating: false)
+    }
+}
+
+
+// MARK: - VisualEffectView
+
+extension LocationListViewController {
+    private func configVisualEffectView() {
+        visualEffectView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(visualEffectView)
+        NSLayoutConstraint.activate([
+            visualEffectView.topAnchor.constraint(equalTo: view.topAnchor),
+            visualEffectView.leftAnchor.constraint(equalTo: view.leftAnchor),
+            visualEffectView.rightAnchor.constraint(equalTo: view.rightAnchor),
+            visualEffectView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+    }
+}
+
+
+// MARK: - Loading Animation
+
+extension LocationListViewController {
+    private func setView(isAnimating: Bool) {
+        visualEffectView.isUserInteractionEnabled = isAnimating
+        UIView.animate(withDuration: 0.4) {
+            isAnimating ? self.activityIndicatorView.startAnimating() : self.activityIndicatorView.stopAnimating()
+            self.visualEffectView.effect = isAnimating ? UIBlurEffect(style: .dark) : nil
+        }
     }
 }

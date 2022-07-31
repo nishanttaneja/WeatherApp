@@ -13,9 +13,11 @@ final class LocationListViewCoordinator: NSObject, Coordinator {
     var rootViewController: UIViewController? = nil
     
     func configRootViewController() {
-        let viewModel: LocationListViewModelProtocol = LocationListViewModel()
+        let storageService: LocationFetchStorageService = LocationCoreDataService()
+        var viewModel: LocationListViewModelProtocol = LocationListViewModel(storageService: storageService)
         let viewController = LocationListViewController(viewModel: viewModel)
+        viewModel.delegate = viewController as LocationListViewModelDelegate
         viewController.coordinator = self
-        rootViewController = viewController
+        rootViewController = UINavigationController(rootViewController: viewController)
     }
 }
