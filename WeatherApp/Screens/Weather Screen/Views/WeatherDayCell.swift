@@ -12,7 +12,7 @@ final class WeatherDayCell: CustomCollectionViewCell {
 
     let weatherView = WeatherDayView()
     
-    func setWeather(minTemp: String, maxTemp: String, forDay day: String) {
+    func setWeather(minTemp: String, maxTemp: String, condition: String, forDay day: String) {
         weatherView.tempImageView.image = .init(systemName: "cloud.sun")?.withTintColor(.white, renderingMode: .alwaysOriginal)
         weatherView.dayLabel.text = day
         weatherView.minTemperatureLabel.text = minTemp
@@ -31,5 +31,11 @@ final class WeatherDayCell: CustomCollectionViewCell {
             weatherView.rightAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.rightAnchor, constant: -padding.right),
             weatherView.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor, constant: -padding.bottom)
         ])
+    }
+}
+
+extension WeatherDayCell {
+    func setWeather(_ detail: WeatherDetail) {
+        setWeather(minTemp: detail.minTemp, maxTemp: detail.maxTemp, condition: detail.condition, forDay: detail.day)
     }
 }

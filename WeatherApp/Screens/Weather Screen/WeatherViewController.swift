@@ -11,11 +11,7 @@ final class WeatherViewController: CustomViewController {
     private let itemSpacing: CGFloat = .zero
     
     private let backgroundView = WeatherBackgroundView()
-    private let titleView: WeatherTitleView = {
-        let titleView = WeatherTitleView()
-        titleView.setWeather(temperature: "68°", condition: "Partly Cloudy", forCity: "New York")
-        return titleView
-    }()
+    private let titleView = WeatherTitleView()
     private let separatorView: UIView = {
         let view = UIView()
         view.backgroundColor = .lightGray
@@ -30,6 +26,8 @@ final class WeatherViewController: CustomViewController {
         stackView.spacing = itemSpacing
         return stackView
     }()
+    
+    private var viewModel: WeatherViewViewModelProtocol? = nil
     
     override func config() {
         super.config()
@@ -57,6 +55,11 @@ final class WeatherViewController: CustomViewController {
 // MARK: - CollectionView
 
 extension WeatherViewController: UICollectionViewDataSource {
+    convenience init(viewModel: WeatherViewViewModelProtocol) {
+        self.init(nibName: nil, bundle: nil)
+        self.viewModel = viewModel
+    }
+    
     // Cell Reuse IDs
     static private let defaultCellReuseId = "WeatherViewController_CollectionViewCell_Default"
     static private let todayWeatherCellReuseId = "WeatherViewController_TodayWeatherViewCell_CustomCollectionViewCell"
@@ -65,7 +68,7 @@ extension WeatherViewController: UICollectionViewDataSource {
     static private let defaultSupplementaryViewReuseId = "WeatherViewController_SupplementaryView_Default"
     static private let weatherDayReusableViewReuseId = "WeatherViewController_WeatherDayReusableView_CustomCollectionReusableView"
     
-    enum WeatherViewSectionKind: Int {
+    enum WeatherViewSectionKind: Int, CaseIterable {
         case today, nextTenDays
     }
     
@@ -133,11 +136,11 @@ extension WeatherViewController: UICollectionViewDataSource {
     // MARK: DataSource
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        2
+        WeatherViewSectionKind.allCases.count
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        12
+        viewModel?.getNumberOfItems(atSection: section) ?? .zero
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -146,12 +149,14 @@ extension WeatherViewController: UICollectionViewDataSource {
         guard let sectionKind = WeatherViewSectionKind(rawValue: indexPath.section) else { return cell }
         switch sectionKind {
         case .today:
-            guard let todayWeatherCell = collectionView.dequeueReusableCell(withReuseIdentifier: Self.todayWeatherCellReuseId, for: indexPath) as? TodayWeatherCell else { return cell }
-            todayWeatherCell.setTemperature("\(68-indexPath.item)", forTime: "\(indexPath.item)")
+            guard let todayWeatherCell = collectionView.dequeueReusableCell(withReuseIdentifier: Self.todayWeatherCellReuseId, for: indexPath) as? TodayWeatherCell,
+                  let hourlyWeather = viewModel?.getHourlyWeather(at: indexPath.item) else { return cell }
+            todayWeatherCell.setTemperature(hourlyWeather)
             return todayWeatherCell
         case .nextTenDays:
-            guard let weatherDayCell = collectionView.dequeueReusableCell(withReuseIdentifier: Self.weatherDayCellReuseId, for: indexPath) as? WeatherDayCell else { return cell }
-            weatherDayCell.setWeather(minTemp: "\(70-indexPath.item)", maxTemp: "\(80-indexPath.item)", forDay: "Day \(indexPath.item+1)")
+            guard let weatherDayCell = collectionView.dequeueReusableCell(withReuseIdentifier: Self.weatherDayCellReuseId, for: indexPath) as? WeatherDayCell,
+                  let weatherDetail = viewModel?.getWeatherDetail(forDayAt: indexPath.item) else { return cell }
+            weatherDayCell.setWeather(weatherDetail)
             return weatherDayCell
         }
     }
@@ -161,17 +166,27 @@ extension WeatherViewController: UICollectionViewDataSource {
         guard kind == UICollectionView.elementKindSectionHeader, let sectionKind = WeatherViewSectionKind(rawValue: indexPath.section) else { return supView }
         switch sectionKind {
         case .today:
-            guard let weatherDayView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.weatherDayReusableViewReuseId, for: indexPath) as? WeatherDayReusableView else {
+            guard let weatherDayView = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: Self.weatherDayReusableViewReuseId, for: indexPath) as? WeatherDayReusableView, let todaysWeather = viewModel?.getTodaysWeather() else {
                 supView.backgroundColor = .lightGray
                 return supView
             }
-            weatherDayView.setWeather(minTemp: "\(72-indexPath.item)", maxTemp: "\(84-indexPath.item)", forDay: "Day \(indexPath.item)")
+            weatherDayView.setTodaysWeather(todaysWeather)
             return weatherDayView
         case .nextTenDays:
             supView.backgroundColor = .lightGray
             return supView
         }
-        
-        
+    }
+}
+
+
+// MARK: - View Lifecycle
+
+extension WeatherViewController {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let todaysWeather = viewModel?.getTodaysWeather() {
+            titleView.setWeather(todaysWeather)
+        }
     }
 }

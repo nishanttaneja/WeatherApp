@@ -45,3 +45,9 @@ final class WeatherDayReusableView: CustomCollectionReusableView {
         ])
     }
 }
+
+extension WeatherDayReusableView {
+    func setTodaysWeather(_ detail: TodayWeatherDetail) {
+        setWeather(minTemp: detail.minTemp, maxTemp: detail.maxTemp, forDay: "Today")
+    }
+}

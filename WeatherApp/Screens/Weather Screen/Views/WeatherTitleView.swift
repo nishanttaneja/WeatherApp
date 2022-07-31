@@ -21,3 +21,9 @@ final class WeatherTitleView: TitleView {
         super.config()
     }
 }
+
+extension WeatherTitleView {
+    func setWeather(_ detail: TodayWeatherDetail) {
+        setWeather(temperature: detail.temp, condition: detail.condition, forCity: detail.city)
+    }
+}

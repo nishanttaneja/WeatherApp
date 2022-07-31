@@ -12,7 +12,7 @@ final class TodayWeatherCell: CustomCollectionViewCell {
     
     private let weatherView = TodayWeatherView()
     
-    func setTemperature(_ temp: String, forTime time: String) {
+    func setTemperature(_ temp: String, condition: String, forTime time: String) {
         weatherView.temperatureLabel.text = temp
         weatherView.timeLabel.text = time
         weatherView.imageView.image = .init(systemName: "cloud.sun")?.withTintColor(.red, renderingMode: .alwaysOriginal)
@@ -28,5 +28,11 @@ final class TodayWeatherCell: CustomCollectionViewCell {
             weatherView.rightAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.rightAnchor, constant: -padding.right),
             weatherView.bottomAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.bottomAnchor, constant: -padding.bottom)
         ])
+    }
+}
+
+extension TodayWeatherCell {
+    func setTemperature(_ detail: HourlyWeatherDetail) {
+        setTemperature(detail.temp, condition: detail.condition, forTime: detail.time)
     }
 }
