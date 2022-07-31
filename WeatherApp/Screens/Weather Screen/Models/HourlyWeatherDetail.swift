@@ -6,9 +6,11 @@
 //
 
 import Foundation
+import UIKit
 
 struct HourlyWeatherDetail {
     let temp: String
     let time: String
     let condition: String
+    let image: UIImage?
 }

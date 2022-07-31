@@ -5,12 +5,19 @@
 //  Created by Nishant Taneja on 31/07/22.
 //
 
-import Foundation
+import UIKit
 
 struct CurrentWeather: Decodable {
     let WeatherText: String
+    let WeatherIcon: Int
     let Temperature: RealFeelTemperature
     let TemperatureSummary: TemperatureSummary
+}
+
+extension CurrentWeather {
+    var image: UIImage? {
+        UIImage(named: "\(WeatherIcon)")
+    }
 }
 
 struct RealFeelTemperature: Decodable {

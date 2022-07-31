@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreLocation
+import UIKit
 
 struct WeatherManagerConstant {
     static let kApiKey = "apikey"
@@ -85,7 +86,8 @@ struct Weather {
     var hourlyForecast: [HourlyForecast] = []
     var minTemp: String?
     var maxTemp: String?
-    var forecasts: [DailyForecasts] = []
+    var forecasts: [DailyForecast] = []
+    var image: UIImage?
 }
 
 extension WeatherManager {
@@ -114,6 +116,7 @@ extension WeatherManager {
                 self.weather.condition = currentCondition.WeatherText
                 self.weather.minTemp = "\(Int(currentCondition.TemperatureSummary.Past6HourRange.Minimum.Metric.Value))"
                 self.weather.maxTemp = "\(Int(currentCondition.TemperatureSummary.Past6HourRange.Maximum.Metric.Value))"
+                self.weather.image = currentCondition.image
             case .failure(let error):
                 self.delegate?.didFail(with: error)
             }

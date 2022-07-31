@@ -46,7 +46,7 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
               let city = weather?.city,
               let minTemp = weather?.minTemp,
               let maxTemp = weather?.maxTemp else { return nil }
-        return .init(temp: feelsLikeTemp, condition: condition, city: city, minTemp: minTemp, maxTemp: maxTemp)
+        return .init(temp: feelsLikeTemp, condition: condition, city: city, minTemp: minTemp, maxTemp: maxTemp, image: weather?.image)
     }
     
     func getNumberOfItems(atSection index: Int) -> Int {
@@ -65,7 +65,7 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
               index < forecasts.count else { return nil }
         let forecast = forecasts[index]
         let hour = forecast.DateTime.components(separatedBy: "T").last?.components(separatedBy: ":").first ?? ""
-        return .init(temp: "\(Int(forecast.Temperature.Value))", time: hour, condition: forecast.IconPhrase)
+        return .init(temp: "\(Int(forecast.Temperature.Value))", time: hour, condition: forecast.IconPhrase, image: forecast.image)
     }
     
     func getWeatherDetail(forDayAt index: Int) -> WeatherDetail? {
@@ -73,7 +73,7 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
               forecasts.count > index else { return nil }
         let forecast = forecasts[index]
         let day = forecast.Date.components(separatedBy: "T").first?.components(separatedBy: "-").last ?? ""
-        return .init(day: day, condition: forecast.Day.IconPhrase, minTemp: "\(Int(forecast.Temperature.Minimum.Value))", maxTemp: "\(Int(forecast.Temperature.Maximum.Value))")
+        return .init(day: day, condition: forecast.Day.IconPhrase, minTemp: "\(Int(forecast.Temperature.Minimum.Value))", maxTemp: "\(Int(forecast.Temperature.Maximum.Value))", image: forecast.image)
     }
     
     func fetchWeatherForCurrentLocation() {

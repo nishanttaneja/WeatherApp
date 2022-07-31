@@ -15,7 +15,6 @@ final class TodayWeatherCell: CustomCollectionViewCell {
     func setTemperature(_ temp: String, condition: String, forTime time: String) {
         weatherView.temperatureLabel.text = temp
         weatherView.timeLabel.text = time
-        weatherView.imageView.image = condition.getSymbolImage()?.withRenderingMode(.alwaysOriginal)
     }
     
     override func config() {
@@ -34,5 +33,6 @@ final class TodayWeatherCell: CustomCollectionViewCell {
 extension TodayWeatherCell {
     func setTemperature(_ detail: HourlyWeatherDetail) {
         setTemperature(detail.temp, condition: detail.condition, forTime: detail.time)
+        weatherView.imageView.image = detail.image
     }
 }

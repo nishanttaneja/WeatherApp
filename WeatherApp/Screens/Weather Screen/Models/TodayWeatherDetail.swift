@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 struct TodayWeatherDetail {
     let temp: String
@@ -13,4 +14,5 @@ struct TodayWeatherDetail {
     let city: String
     let minTemp: String
     let maxTemp: String
+    let image: UIImage?
 }

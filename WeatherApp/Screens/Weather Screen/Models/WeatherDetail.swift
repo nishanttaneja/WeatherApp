@@ -6,10 +6,12 @@
 //
 
 import Foundation
+import UIKit
 
 struct WeatherDetail {
     let day: String
     let condition: String
     let minTemp: String
     let maxTemp: String
+    let image: UIImage?
 }
