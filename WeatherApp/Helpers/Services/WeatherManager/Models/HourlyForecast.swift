@@ -10,5 +10,5 @@ import Foundation
 struct HourlyForecast: Decodable {
     let DateTime: String
     let IconPhrase: String
-    let RealFeelTemperature: Temperature
+    let Temperature: Temperature
 }

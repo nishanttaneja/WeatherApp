@@ -38,16 +38,27 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     func getTodaysWeather() -> TodayWeatherDetail? {
         guard let feelsLikeTemp = weather?.feelsLikeTemp,
               let condition = weather?.condition,
-              let city = weather?.city else { return nil }
-        return .init(temp: feelsLikeTemp, condition: condition, city: city, minTemp: "68", maxTemp: "72")
+              let city = weather?.city,
+              let minTemp = weather?.minTemp,
+              let maxTemp = weather?.maxTemp else { return nil }
+        return .init(temp: feelsLikeTemp, condition: condition, city: city, minTemp: minTemp, maxTemp: maxTemp)
     }
     
     func getNumberOfItems(atSection index: Int) -> Int {
-        10
+        switch WeatherViewController.WeatherViewSectionKind(rawValue: index) {
+        case .today:
+            return weather?.hourlyForecast.count ?? .zero
+        default:
+            return .zero
+        }
     }
     
     func getHourlyWeather(at index: Int) -> HourlyWeatherDetail? {
-        .init(temp: "\(69-index)", time: "\(12+index)", condition: "cloudy")
+        guard let forecasts = weather?.hourlyForecast,
+              index < forecasts.count else { return nil }
+        let forecast = forecasts[index]
+        let hour = forecast.DateTime.components(separatedBy: "T").last?.components(separatedBy: ":").first ?? ""
+        return .init(temp: "\(forecast.Temperature.Value)", time: hour, condition: forecast.IconPhrase)
     }
     
     func getWeatherDetail(forDayAt index: Int) -> WeatherDetail? {

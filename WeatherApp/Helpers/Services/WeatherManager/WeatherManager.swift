@@ -11,6 +11,7 @@ import CoreLocation
 struct WeatherManagerConstant {
     static let kApiKey = "apikey"
     static let kDetails = "details"
+    static let kMetric = "metric"
 }
 
 protocol WeatherManagerServiceDelegate: NSObjectProtocol {
@@ -34,6 +35,7 @@ final class WeatherManager: WeatherManagerService {
     
     private let apiKey = "L2qDHC76QoM6GbLe8S6qXdioYWVpNSbP"
     private let currentConditionsAPIService: APIService = .currentConditions
+    private let hourlyForecastAPIService: APIService = .hourlyForecast
     
     weak var delegate: WeatherManagerServiceDelegate? = nil
     
@@ -75,6 +77,9 @@ struct Weather {
     var condition: String?
     var feelsLikeTemp: String?
     var city: String?
+    var hourlyForecast: [HourlyForecast] = []
+    var minTemp: String?
+    var maxTemp: String?
 }
 
 extension WeatherManager {
@@ -84,7 +89,9 @@ extension WeatherManager {
             .init(name: WeatherManagerConstant.kApiKey, value: apiKey),
             .init(name: WeatherManagerConstant.kDetails, value: "true"),
         ]
-        fetchCurrentWeatherConditions(appendingString: "/\(cityDetail.Key)", withParameters: params)
+        let cityKey = "/\(cityDetail.Key)"
+        fetchCurrentWeatherConditions(appendingString: cityKey, withParameters: params)
+        fetchHourlyForecast(appendingString: cityKey, withParamters: params)
         dispatchGroup.notify(queue: .main) {
             completionHandler(.success(self.weather))
         }
@@ -96,10 +103,27 @@ extension WeatherManager {
             switch result {
             case .success(let currentWeather):
                 guard let currentCondition = currentWeather.first else { break }
-                self.weather.feelsLikeTemp = "\(currentCondition.RealFeelTemperature.Metric.Value)°"
+                self.weather.feelsLikeTemp = "\(currentCondition.Temperature.Metric.Value)°"
                 self.weather.condition = currentCondition.WeatherText
+                self.weather.minTemp = "\(currentCondition.TemperatureSummary.Past6HourRange.Minimum.Metric.Value)"
+                self.weather.maxTemp = "\(currentCondition.TemperatureSummary.Past6HourRange.Maximum.Metric.Value)"
             case .failure(let error):
                 self.delegate?.didFail(with: error)
+            }
+            self.dispatchGroup.leave()
+        }
+    }
+    
+    private func fetchHourlyForecast(appendingString text: String, withParamters params: [URLQueryItem]) {
+        dispatchGroup.enter()
+        var params = params
+        params.append(.init(name: WeatherManagerConstant.kMetric, value: "true"))
+        hourlyForecastAPIService.fetchResponse(appendingString: text, withParameters: params) { result in
+            switch result {
+            case .failure(let error):
+                self.delegate?.didFail(with: error)
+            case .success(let hourlyForecast):
+                self.weather.hourlyForecast = hourlyForecast
             }
             self.dispatchGroup.leave()
         }
