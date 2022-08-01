@@ -100,6 +100,7 @@ extension LocationListViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
+        searchBar.text = nil
         viewModel?.loadLocations()
     }
 }

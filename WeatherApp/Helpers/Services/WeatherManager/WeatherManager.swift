@@ -33,7 +33,7 @@ final class WeatherManager: WeatherManagerService {
     static let shared: WeatherManagerService = WeatherManager()
     private init() {}
     
-    private let apiKey = "AcxtHurklXeoYdPXUGnhmp2wEBG7lVxU"
+    private let apiKey = "G7hVXWdxs6fRXAv7x2psnKAFYZicUnKU"
     private let currentConditionsAPIService: APIService = .currentConditions
     private let hourlyForecastAPIService: APIService = .hourlyForecast
     private let fiveDayForecastAPIService: APIService = .fiveDayForecast

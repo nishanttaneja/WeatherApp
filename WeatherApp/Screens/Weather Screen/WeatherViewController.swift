@@ -221,11 +221,7 @@ extension WeatherViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        setView(isAnimating: true)
         viewModel?.fetchWeatherForCurrentLocation()
-        if let todaysWeather = viewModel?.getTodaysWeather() {
-            titleView.setWeather(todaysWeather)
-        }
     }
 }
 

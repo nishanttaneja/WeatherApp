@@ -28,7 +28,7 @@ protocol WeatherViewViewModelProtocol {
 
 class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     private let storageService: LocationInsertStorageService
-    
+
     init(storageService: LocationInsertStorageService) {
         self.storageService = storageService
         super.init()
@@ -43,6 +43,12 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     weak var delegate: WeatherViewViewModelDelegate? = nil
     
     private var weather: Weather? = nil
+    private var locationAuthorizationStatus: CLAuthorizationStatus? = nil {
+        didSet {
+            guard locationAuthorizationStatus != nil else { return }
+            fetchWeatherForCurrentLocation()
+        }
+    }
     
     @objc private func didSelectCity(notification: NSNotification) {
         guard let city = notification.object as? String else { return }
@@ -86,13 +92,16 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     }
     
     func fetchWeatherForCurrentLocation() {
-        guard locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways else {
+        guard locationAuthorizationStatus == .authorizedWhenInUse || locationAuthorizationStatus == .authorizedAlways else {
             locationManager.requestWhenInUseAuthorization()
-            fetchWeatherForCurrentLocation()
             return
         }
         delegate?.willFetchCurrentLocation()
         locationManager.startUpdatingLocation()
+    }
+    
+    func requestLocationAccess() {
+        locationManager.requestWhenInUseAuthorization()
     }
 }
 
@@ -136,5 +145,9 @@ extension WeatherViewViewModel: CLLocationManagerDelegate {
         guard let coordinate = locations.first?.coordinate else { return }
         locationManager.stopUpdatingLocation()
         weatherManager.fetchWeather(forLocation: coordinate)
+    }
+    
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        locationAuthorizationStatus = manager.authorizationStatus
     }
 }
