@@ -45,7 +45,8 @@ class WeatherViewViewModel: NSObject, WeatherViewViewModelProtocol {
     private var weather: Weather? = nil
     
     @objc private func didSelectCity(notification: NSNotification) {
-        debugPrint(notification.object as? String)
+        guard let city = notification.object as? String else { return }
+        weatherManager.fetchWeather(forLocation: city)
     }
     
     func getTodaysWeather() -> TodayWeatherDetail? {

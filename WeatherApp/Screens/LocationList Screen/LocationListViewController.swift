@@ -26,7 +26,7 @@ final class LocationListViewController: CustomViewController {
     
     convenience init(viewModel: LocationListViewModelProtocol) {
         self.init(nibName: nil, bundle: nil)
-        self.view.backgroundColor = .darkGray
+        self.view.backgroundColor = .secondarySystemGroupedBackground
         self.viewModel = viewModel
         title = "Locations"
     }
@@ -41,6 +41,16 @@ extension LocationListViewController: UITableViewDataSource, UITableViewDelegate
     private func configTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.defaultCellReuseId)
         tableView.dataSource = self
+        tableView.delegate = self
+        tableView.backgroundColor = .secondarySystemGroupedBackground
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor),
+            tableView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
     }
     
     // MARK: DataSource
@@ -59,6 +69,7 @@ extension LocationListViewController: UITableViewDataSource, UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         viewModel?.didSelectLocation(at: indexPath.row)
+        dismiss(animated: true)
     }
 }
 
@@ -75,6 +86,7 @@ extension LocationListViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.navigationBar.prefersLargeTitles = true
+        viewModel?.loadLocations()
     }
 }
 

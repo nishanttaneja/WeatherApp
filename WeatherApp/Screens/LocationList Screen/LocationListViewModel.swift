@@ -18,6 +18,7 @@ protocol LocationListViewModelProtocol {
     func getNumberOfLocations() -> Int
     func getLocation(at index: Int) -> LocationItem?
     func didSelectLocation(at index: Int)
+    func loadLocations()
 }
 
 final class LocationListViewModel: NSObject, LocationListViewModelProtocol {
