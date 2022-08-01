@@ -19,6 +19,7 @@ protocol LocationListViewModelProtocol {
     func getLocation(at index: Int) -> LocationItem?
     func didSelectLocation(at index: Int)
     func loadLocations()
+    func didSearch(_ text: String)
 }
 
 final class LocationListViewModel: NSObject, LocationListViewModelProtocol {
@@ -48,7 +49,11 @@ final class LocationListViewModel: NSObject, LocationListViewModelProtocol {
     func didSelectLocation(at index: Int) {
         guard locations.count > index else { return }
         let location = locations[index]
-        NotificationCenter.default.post(name: .selectCity, object: location.title)
+        postNotification(forLocation: location.title)
+    }
+    
+    func didSearch(_ text: String) {
+        postNotification(forLocation: text)
     }
     
     func loadLocations() {
@@ -64,5 +69,11 @@ final class LocationListViewModel: NSObject, LocationListViewModelProtocol {
                 }
             }
         }
+    }
+}
+
+extension LocationListViewModel {
+    private func postNotification(forLocation title: String) {
+        NotificationCenter.default.post(name: .selectCity, object: title)
     }
 }

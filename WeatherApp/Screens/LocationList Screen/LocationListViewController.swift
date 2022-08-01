@@ -11,7 +11,13 @@ final class LocationListViewController: CustomViewController {
     private let tableView = UITableView(frame: .zero, style: .grouped)
     private let visualEffectView = UIVisualEffectView()
     private let activityIndicatorView = UIActivityIndicatorView(style: .large)
-    
+    private let searchBar: UISearchBar = {
+        let bar = UISearchBar()
+        bar.searchBarStyle = .minimal
+        bar.placeholder = " Search..."
+        return bar
+    }()
+
     weak var coordinator: LocationListViewCoordinator? = nil
     
     private var viewModel: LocationListViewModelProtocol? = nil
@@ -22,6 +28,7 @@ final class LocationListViewController: CustomViewController {
         configTableView()
         configVisualEffectView()
         view.addSubview(activityIndicatorView)
+        searchBar.delegate = self
     }
     
     convenience init(viewModel: LocationListViewModelProtocol) {
@@ -37,12 +44,15 @@ final class LocationListViewController: CustomViewController {
 
 extension LocationListViewController: UITableViewDataSource, UITableViewDelegate {
     static private let defaultCellReuseId = "LocationListViewController_UITableViewCell"
+    static private let headerReuseId = "LocationListViewController_UITableViewHeaderFooterView"
     
     private func configTableView() {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: Self.defaultCellReuseId)
+        tableView.register(UITableViewHeaderFooterView.self, forHeaderFooterViewReuseIdentifier: Self.headerReuseId)
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = .secondarySystemGroupedBackground
+        tableView.keyboardDismissMode = .interactive
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         NSLayoutConstraint.activate([
@@ -63,6 +73,10 @@ extension LocationListViewController: UITableViewDataSource, UITableViewDelegate
         let cell = tableView.dequeueReusableCell(withIdentifier: Self.defaultCellReuseId, for: indexPath)
         cell.textLabel?.text = viewModel?.getLocation(at: indexPath.row)?.title
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        searchBar
     }
     
     // MARK: Delegate
@@ -137,5 +151,16 @@ extension LocationListViewController {
             isAnimating ? self.activityIndicatorView.startAnimating() : self.activityIndicatorView.stopAnimating()
             self.visualEffectView.effect = isAnimating ? UIBlurEffect(style: .dark) : nil
         }
+    }
+}
+
+
+// MARK: - SearchBar
+
+extension LocationListViewController: UISearchBarDelegate {
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        guard let city = searchBar.text, !city.isEmpty else { return }
+        viewModel?.didSearch(city)
+        dismiss(animated: true)
     }
 }
