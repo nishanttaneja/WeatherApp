@@ -60,7 +60,7 @@ extension APIService {
     static var searchGeoPosition: APIService<CityDetail> {
         APIService<CityDetail>(endpointUrlString: "/locations/v1/cities/geoposition/search")
     }
-    static var searchCity: APIService<CityDetail> {
-        APIService<CityDetail>(endpointUrlString: "/locations/v1/cities/search")
+    static var searchCity: APIService<[CityDetail]> {
+        APIService<[CityDetail]>(endpointUrlString: "/locations/v1/cities/search")
     }
 }

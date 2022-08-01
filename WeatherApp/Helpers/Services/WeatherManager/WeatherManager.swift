@@ -67,7 +67,15 @@ final class WeatherManager: WeatherManagerService {
             .init(name: WeatherManagerConstant.kApiKey, value: apiKey),
             .init(name: WeatherManagerConstant.kSearchText, value: city),
         ]
-        citySearchAPIService.fetchResponse(withParameters: params, completionHandler: fetchedCityClosure)
+        citySearchAPIService.fetchResponse(withParameters: params) { result in
+            switch result {
+            case .failure(let error):
+                self.fetchedCityClosure(.failure(error))
+            case .success(let cities):
+                guard let city = cities.first else { return }
+                self.fetchedCityClosure(.success(city))
+            }
+        }
     }
     
     private func fetchWeather(forCity detail: CityDetail) {
